@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Mariscos El Chino</title>
+
+<style>
+html, body {
+    margin: 0;
+    height: 100%;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background-image: url("{{ url_for('static', filename='fondo.png') }}");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.overlay {
+    min-height: 100vh;
+    background: rgba(0,0,0,0.9);
+    padding: 30px;
+}
+
+.card {
+    background: rgba(20,20,20,0.95);
+    padding: 20px;
+    border-radius: 18px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+.banner {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.banner img {
+    max-width: 220px;
+}
+
+button {
+    background: #1e1e1e;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+}
+</style>
+</head>
+
+<body>
+<div class="overlay">
+
+<div class="banner">
+    <img src="{{ url_for('static', filename='logo.png') }}">
+</div>
+
+<div class="card">
+    <h3>➕ Crear mesa</h3>
+    <form method="POST">
+        <input name="nombre" placeholder="Nombre de la mesa" required>
+        <button name="accion" value="crear_mesa">Crear</button>
+    </form>
+</div>
+
+{% if mesa_activa %}
+<div class="card">
+    <h3>🍽️ Mesa activa: {{ mesa_activa }}</h3>
+    {% for p, precio in menu.items() %}
+    <form method="POST" style="display:inline;">
+        <input type="hidden" name="platillo" value="{{ p }}">
+        <button name="accion" value="agregar_pedido">
+            {{ p }} (${{ precio }})
+        </button>
+    </form>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% for mesa, data in mesas.items() %}
+<div class="card">
+    <h3>📂 {{ mesa }}</h3>
+
+    {% for p in data.pedidos %}
+    <form method="POST">
+        {{ p.nombre }} - ${{ p.precio }}
+        <input type="hidden" name="mesa" value="{{ mesa }}">
+        <input type="hidden" name="index" value="{{ loop.index0 }}">
+        <button name="accion" value="borrar_pedido">❌</button>
+    </form>
+    {% endfor %}
+
+    <h3>Total: ${{ data.total }}</h3>
+
+    <form method="POST">
+        <input type="hidden" name="mesa" value="{{ mesa }}">
+        <button name="accion" value="cerrar_mesa">🧾 Cerrar cuenta</button>
+    </form>
+</div>
+{% endfor %}
+
+</div>
+</body>
+</html>
